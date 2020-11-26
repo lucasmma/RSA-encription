@@ -1,6 +1,7 @@
 #!usr/bin
 import HandlePrimes as primes
-import gmpy2
+import base64
+import sympy 
 
 
 def getPairPrimes():
@@ -12,7 +13,7 @@ def getPairPrimes():
 
     return p,q
 
-def rsaEncryption(): 
+def generateKeys(): 
 
     p, q = getPairPrimes()
 
@@ -22,17 +23,16 @@ def rsaEncryption():
 
     e = getFirstCoPrime(totiente)
 
-    d = modinv(e, n)
+    d = sympy.mod_inverse(e, totiente)
 
-    print("Primeiro Primo p:\t", p)
-    print("Segundo Primo q:\t", q)
-    print("Valor de n:\t", n)
-    print("Valor do totiente:\t", totiente)
-    print("Valor da chave e:\t", e)
-    print("Valor da chave d:\t", d)
-    print("Valor igual: d=gmpy", gmpy2.invert(e, n) == d)
+    # print("Primeiro Primo p:\t", p)
+    # print("Segundo Primo q:\t", q)
+    # print("Valor de n:\t", n)
+    # print("Valor do totiente:\t", totiente)
+    # print("Valor da chave e:\t", e)
+    # print("Valor da chave d:\t", d)
 
-
+    return e,d,n
 
 def multiplyLargeNumber(n1, n2):
     return n1*n2
@@ -49,30 +49,35 @@ def gcd(a,b):
     return a
 
 def getFirstCoPrime(totiente):
-    for i in range(2, totiente + 1):
+    for i in range(2**1024, totiente + 1):
         mdc = gcd(i, totiente)
         # print("Number: ", i , "\tMDC:  ", mdc)
         if mdc == 1:
-            print("First CoPrime: ", i, "\tTotiente:   ", totiente)
+            # print("First CoPrime: ", i, "\tTotiente:   ", totiente)
             return i
 
-
-def egcd(a, b):
-    if a == 0:
-        return (b, 0, 1)
-    else:
-        g, y, x = egcd(b % a, a)
-        return (g, x - (b // a) * y, y)
-
-def modinv(a, m):
+def encrypt(msg, e, n):
     """
-        Calculate the modular inverse
+        Encrypt function
     """
-    g, x, y = egcd(a, m)
-    if g != 1:
-        raise Exception('modular inverse does not exist')
-    else:
-        return x % m
 
+    b = int.from_bytes(msg.encode(), "big")
 
-rsaEncryption()
+    msgcifrada = pow(b, e, n)
+
+    return msgcifrada
+
+def decrypt(msg, d, n):
+    """
+        Decrypt function
+    """
+
+    msgdecifrada = int_to_bytes(pow(msg, d, n)).decode("utf-8")
+
+    return msgdecifrada
+
+def int_to_bytes(x: int) -> bytes:
+    return x.to_bytes((x.bit_length() + 7) // 8, 'big')
+
+def int_from_bytes(xbytes: bytes) -> int:
+    return int.from_bytes(xbytes, 'big')
