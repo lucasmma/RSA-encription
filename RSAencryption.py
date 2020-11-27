@@ -23,7 +23,7 @@ def generateKeys():
 
     e = getFirstCoPrime(totiente)
 
-    d = sympy.mod_inverse(e, totiente)
+    d = modinv(e, totiente)
 
     # print("Primeiro Primo p:\t", p)
     # print("Segundo Primo q:\t", q)
@@ -48,6 +48,20 @@ def gcd(a,b):
 
     return a
 
+def egcd(a, b):
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = egcd(b % a, a)
+        return (g, x - (b // a) * y, y)
+
+def modinv(a, m):
+    g, x, y = egcd(a, m)
+    if g != 1:
+        raise Exception('modular inverse does not exist')
+    else:
+        return x % m
+
 def getFirstCoPrime(totiente):
     for i in range(2**1024, totiente + 1):
         mdc = gcd(i, totiente)
@@ -61,7 +75,7 @@ def encrypt(msg, e, n):
         Encrypt function
     """
 
-    b = int.from_bytes(msg.encode(), "big")
+    b = int.from_bytes(msg, "big")
 
     msgcifrada = pow(b, e, n)
 
@@ -72,7 +86,7 @@ def decrypt(msg, d, n):
         Decrypt function
     """
 
-    msgdecifrada = int_to_bytes(pow(msg, d, n)).decode("utf-8")
+    msgdecifrada = int_to_bytes(pow(msg, d, n))
 
     return msgdecifrada
 
