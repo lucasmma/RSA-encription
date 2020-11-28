@@ -3,6 +3,7 @@
 import HandlePrimes as primes
 import base64
 import sympy 
+import SHA3
 
 
 def getPairPrimes():
@@ -71,12 +72,15 @@ def getFirstCoPrime(totiente):
             # print("First CoPrime: ", i, "\tTotiente:   ", totiente)
             return i
 
-def encrypt(msg, e, n):
+def encrypt(msg, e, n, nonce, g, h):
     """
         Encrypt function
     """
 
-    b = int.from_bytes(msg, "big")
+    messageInBitArray = SHA3.hexStringToBitArray(msg.hex())
+    oaep = oaep_pad(messageInBitArray, nonce, g, h)
+    
+    b = int_from_bytes(oaep)
 
     msgcifrada = pow(b, e, n)
 
@@ -96,3 +100,13 @@ def int_to_bytes(x: int) -> bytes:
 
 def int_from_bytes(xbytes: bytes) -> int:
     return int.from_bytes(xbytes, 'big')
+
+def xor(a, b):
+    assert len(a) == len(b)
+    return [aa^bb for aa, bb in zip(a,b)]
+
+def oaep_pad(message, nonce, g, h):
+    mm = message + [0] * (g-len(message))
+    G = xor(mm, hash(nonce, g))
+    H = xor(nonce, hash(G, h))
+    return G+H

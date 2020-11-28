@@ -6,9 +6,6 @@ import math
 import RSAencryption as RSA
 from bitstring import BitArray
 
-RHO_MATRICES = {tuple(np.linalg.matrix_power(np.array([[0,1],[2,3]]), t).dot(np.array([1,0])) % 5): t for t in range(0,24)}
-RHO_MATRICES[(0,0)] = -1
-
 def xorArrays(array1,array2):
     newArray = [0 for _ in range(64)]
     for i in range(64):
@@ -89,18 +86,6 @@ def theta(A_in):
         d[i] = xorArrays(c[(i-1) % 5],rotateArray(c[(i + 1) % 5],1))         
         for j in range(5):
             A_out[i][j] = xorArrays(A_in[i][j],d[i])    
-
-    return A_out
-
-rhomatrix=[[0,36,3,41,18],[1,44,10,45,2],[62,6,43,15,61],[28,55,25,21,56],[27,20,39,8,14]]
-def rho(A_in):
-    A_out = [[[0 for _ in range(64)] for _ in range(5)] for _ in range(5)]
-    for i in range(5):
-        for j in range(5):
-            for k in range(64):
-                t = RHO_MATRICES[(i,j)]
-                b = A_in[i][j][k - rhomatrix[i][j]]
-                A_out[i][j][k] = b
 
     return A_out
 

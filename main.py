@@ -23,6 +23,10 @@ def main():
     
     print("Mensagem cifrada : \t", msgcifrada)
 
+    documentoassinado = str(hash.hex()) + str(msgcifrada) + msg
+
+    print(documentoassinado)
+
     msgdecifrada = RSAenc.decrypt(msgcifrada, d, n)
 
     print("Mensagem decifrada : \t", msgdecifrada.hex())
