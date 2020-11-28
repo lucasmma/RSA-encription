@@ -1,4 +1,5 @@
 #!usr/bin
+#coding: utf8
 import HandlePrimes as primes
 import base64
 import sympy 

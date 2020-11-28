@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #!bin/usr
 
 from random import randrange, getrandbits
