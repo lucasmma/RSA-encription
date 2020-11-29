@@ -132,7 +132,18 @@ def hexStringToBitArray(word):
     return [int(char) for char in bit_string]
 
 #  ι ◦ χ ◦ π ◦ ρ ◦ θ
-def sha3(A_in):
+
+def sha3(msg,blocksize,returnSize):
+    msgOrganized = organizeInputMessage(msg,blocksize)
+    hash = getBytesFromBitArray(final_sha3(msgOrganized,blocksize)[:returnSize])
+    return hash
+
+def sha3_from_bits(msg,blocksize,returnSize):
+    msgOrganized = organizeInputMessage(msg,blocksize,False)
+    hash = getBytesFromBitArray(final_sha3(msgOrganized,blocksize)[:returnSize])
+    return hash
+
+def inner_sha3(A_in):
     roundOut = arrTransform1(A_in)
 
     for r in range(24):
@@ -151,9 +162,9 @@ def final_sha3(A_in, blocksize):
     # currentState = sha3(A_in[0])
     for i in A_in:
         currentState = sha3_xor(currentState, i, blocksize)
-        currentState = sha3(currentState)
+        currentState = inner_sha3(currentState)
 
-    return getStringFromBitArray(currentState[0:256])
+    return currentState
 
 def sha3_xor(aone, atwo, blocksize):
     for i in range(0, 1600):
@@ -165,8 +176,11 @@ def sha3_xor(aone, atwo, blocksize):
     return aone
 
 
-def organizeInputMessage(msg, blocksize):
-    arrayofbits = toBits(msg)
+def organizeInputMessage(msg, blocksize,inString = True):
+    if inString:
+        arrayofbits = toBits(msg)
+    else:
+        arrayofbits = msg
 
     numberOfChunks = math.ceil(len(arrayofbits)/blocksize)
 
@@ -213,15 +227,6 @@ def fromBits(bits):
         chars.append(chr(int(''.join([str(bit) for bit in byte]), 2)))
     return ''.join(chars)
 
-def getStringFromBitArray(bitArray):
-
-    value = 0
-
-    for bit in bitArray:
-        value = (value << 1) | bit
-
-    return RSA.int_to_bytes(value)
-
 def getBytesFromBitArray(bitArray):
 
     value = 0
@@ -235,7 +240,7 @@ def printMatriz3D(A_in):
     for i in range(0,5):
         print("||||")
         for x in range(0,5):
-            print(getStringFromBitArray(A_in[i][x]).hex())
+            print(getBytesFromBitArray(A_in[i][x]).hex())
 
 def printArray3D(A_in):
-        print(getStringFromBitArray(A_in).hex())
+        print(getBytesFromBitArray(A_in).hex())

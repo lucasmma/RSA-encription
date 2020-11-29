@@ -15,17 +15,17 @@ def main():
     print("DEC: \t", d)
     print("N: \t", n)
     
-    hash = SHA3.final_sha3(SHA3.organizeInputMessage(msg, 1088),1088)
+    hash = SHA3.sha3(msg, 1088,256)
 
     print("SHA3: \t", hash.hex())
 
     msgcifrada = RSAenc.encrypt(hash, e, n)
     
-    print("Mensagem cifrada : \t", msgcifrada)
+    print("Mensagem cifrada : \t", RSAenc.int_to_bytes(msgcifrada).hex())
 
-    documentoassinado = str(hash.hex()) + str(msgcifrada) + msg
+    # documentoassinado = str(hash.hex()) + str(msgcifrada) + msg
 
-    print(documentoassinado)
+    # print(documentoassinado)
 
     msgdecifrada = RSAenc.decrypt(msgcifrada, d, n)
 
