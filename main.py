@@ -4,21 +4,29 @@ import RSAencryption as RSAenc
 import base64
 import SHA3
 
+def getFileMSG():
+    filename = str(input("Digite o path para o arquivo: "))
+    return openFile(filename)
+
 def openFile(filename):
-    with open(filename, 'rb') as f:
-        content = f.read()
-        contentbit = RSAenc.bytes_to_bits(content)
-        return SHA3.fromBits(contentbit)
+    try:
+        with open(filename, 'rb') as f:
+            content = f.read()
+            contentbit = RSAenc.bytes_to_bits(content)
+            return SHA3.fromBits(contentbit)
+    except FileNotFoundError:
+        print("Arquivo não encontrado, digite outro path.")
+        return getFileMSG()
+        
 
 def createFile(assinatura):
     f = open("signed.txt", "w")
     f.write(assinatura)
+    print("Cheque o arquivo signed.txt para visualizar o documento assinado.")
 
 def main():
 
-    filename = str(input("Digite o nome do arquivo: "))
-
-    msg = openFile(filename)
+    msg = getFileMSG()
 
     e, d, n = RSAenc.generateKeys()
 
@@ -36,7 +44,6 @@ def main():
 
     documentoassinado = str(hash.hex()) + str(RSAenc.int_to_bytes(hashcifrado).hex()) + msg
 
-    print("Documento total: \t", documentoassinado)
     createFile(documentoassinado)
 
     hashparsedhex = documentoassinado[:64]
