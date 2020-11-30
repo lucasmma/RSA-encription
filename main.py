@@ -3,6 +3,7 @@
 import RSAencryption as RSAenc
 import base64
 import SHA3
+from Utils import bits_from_bytes, string_from_bits, bytes_from_int, bytes_from_bits, bits_from_hexadecimal
 
 def getFileMSG():
     filename = str(input("Digite o path para o arquivo: "))
@@ -12,8 +13,8 @@ def openFile(filename):
     try:
         with open(filename, 'rb') as f:
             content = f.read()
-            contentbit = RSAenc.bytes_to_bits(content)
-            return SHA3.fromBits(contentbit)
+            contentbit = bits_from_bytes(content)
+            return string_from_bits(contentbit)
     except FileNotFoundError:
         print("Arquivo não encontrado, digite outro path.")
         return getFileMSG()
@@ -40,9 +41,9 @@ def main():
 
     hashcifrado = RSAenc.encrypt(hash, e, n)
     
-    print("Mensagem cifrada : \t", RSAenc.int_to_bytes(hashcifrado).hex())
+    print("Mensagem cifrada : \t", bytes_from_int(hashcifrado).hex())
 
-    documentoassinado = str(hash.hex()) + str(RSAenc.int_to_bytes(hashcifrado).hex()) + msg
+    documentoassinado = str(hash.hex()) + str(bytes_from_int(hashcifrado).hex()) + msg
 
     createFile(documentoassinado)
 
@@ -50,7 +51,7 @@ def main():
     hashcifradohex = documentoassinado[64:576]
     mensagem = documentoassinado[576:]
 
-    hashdecifradohex = RSAenc.decrypt(RSAenc.int_from_bytes(SHA3.getBytesFromBitArray(SHA3.hexStringToBitArray(hashcifradohex))) , d, n).hex()
+    hashdecifradohex = RSAenc.decrypt(RSAenc.int_from_bytes(bytes_from_bits(bits_from_hexadecimal(hashcifradohex))) , d, n).hex()
 
     if hashparsedhex == hashdecifradohex:
         print("Hash é valido")

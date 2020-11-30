@@ -6,17 +6,12 @@ import sympy
 import SHA3
 import random
 from hashlib import sha512
+from Utils import bits_from_bytes, bytes_from_int, bytes_from_bits, int_from_bytes
 
 g = 512
 h = 512
 
-def int_to_bytes(x: int) -> bytes:
-    return x.to_bytes((x.bit_length() + 7) // 8, 'big')
-
-def bytes_to_bits(b):
-    return SHA3.hexStringToBitArray("0x" + b.hex())
-
-nonce = bytes_to_bits(int_to_bytes(random.getrandbits(h)))
+nonce = bits_from_bytes(bytes_from_int(random.getrandbits(h)))
 
 def getPairPrimes():
     """
@@ -89,7 +84,7 @@ def encrypt(msg, e, n):
         Encrypt function
     """
 
-    messageInBitArray = bytes_to_bits(msg)
+    messageInBitArray = bits_from_bytes(msg)
 
     if 1088 < len(messageInBitArray):
         print("Mensagem muito longa")
@@ -97,7 +92,7 @@ def encrypt(msg, e, n):
 
     oaep = oaep_pad(messageInBitArray)
     
-    b = int_from_bytes(SHA3.getBytesFromBitArray(oaep))
+    b = int_from_bytes(bytes_from_bits(oaep))
 
     msgcifrada = pow(b, e, n)
 
@@ -108,19 +103,15 @@ def decrypt(msg, d, n):
         Decrypt function
     """
 
-    msgdecifrada = int_to_bytes(pow(msg, d, n))
+    msgdecifrada = bytes_from_int(pow(msg, d, n))
 
     # return msgdecifrada
 
-    preOEAP = bytes_to_bits(msgdecifrada)
+    preOEAP = bits_from_bytes(msgdecifrada)
 
     posOEAP = remove_oeappad(preOEAP)
 
-    return SHA3.getBytesFromBitArray(posOEAP[:256])
-
-
-def int_from_bytes(xbytes: bytes) -> int:
-    return int.from_bytes(xbytes, 'big')
+    return bytes_from_bits(posOEAP[:256])
 
 def xor(a, b):
     assert len(a) == len(b)
@@ -128,7 +119,7 @@ def xor(a, b):
 
 def hash(input_, length):
     h = SHA3.sha3_from_bits(input_,1088,length)
-    return bytes_to_bits(h)
+    return bits_from_bytes(h)
 
 def oaep_pad(message):
     mm = message + [0] * (g-len(message))

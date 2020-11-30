@@ -4,7 +4,7 @@
 import numpy as np
 import math
 import RSAencryption as RSA
-from bitstring import BitArray
+from Utils import bytes_from_bits, bits_from_string, bits_from_hexadecimal
 
 def xorArrays(array1,array2):
     newArray = [0 for _ in range(64)]
@@ -39,7 +39,7 @@ def rotateArray(arr,n):
             newArray[j] = newArray[j+1];    
                   
         newArray[len(newArray)-1] = first; 
-    return newArray   
+    return newArray
 
 
 def arrTransform1(arr):
@@ -123,24 +123,20 @@ def iota(A_in, round):
             ,"0x000000000000800a","0x800000008000000a","0x8000000080008081"
             ,"0x8000000000008080","0x0000000080000001","0x8000000080008008",]
     A_out = A_in.copy()
-    A_out[0][0] = xorArrays(A_out[0][0],hexStringToBitArray(RC[round]))
+    A_out[0][0] = xorArrays(A_out[0][0], bits_from_hexadecimal(RC[round]))
 
     return A_out
-
-def hexStringToBitArray(word): 
-    bit_string = BitArray(hex=word).bin
-    return [int(char) for char in bit_string]
 
 #  ι ◦ χ ◦ π ◦ ρ ◦ θ
 
 def sha3(msg,blocksize,returnSize):
     msgOrganized = organizeInputMessage(msg,blocksize)
-    hash = getBytesFromBitArray(final_sha3(msgOrganized,blocksize)[:returnSize])
+    hash = bytes_from_bits(final_sha3(msgOrganized,blocksize)[:returnSize])
     return hash
 
 def sha3_from_bits(msg,blocksize,returnSize):
     msgOrganized = organizeInputMessage(msg,blocksize,False)
-    hash = getBytesFromBitArray(final_sha3(msgOrganized,blocksize)[:returnSize])
+    hash = bytes_from_bits(final_sha3(msgOrganized,blocksize)[:returnSize])
     return hash
 
 def inner_sha3(A_in):
@@ -178,7 +174,7 @@ def sha3_xor(aone, atwo, blocksize):
 
 def organizeInputMessage(msg, blocksize,inString = True):
     if inString:
-        arrayofbits = toBits(msg)
+        arrayofbits = bits_from_string(msg)
     else:
         arrayofbits = msg
 
@@ -211,36 +207,11 @@ def organizeInputMessage(msg, blocksize,inString = True):
     
     return matriz
 
-
-def toBits(s):
-    result = []
-    for c in s:
-        bits = bin(ord(c))[2:]
-        bits = '00000000'[len(bits):] + bits
-        result.extend([int(b) for b in bits])
-    return result
-
-def fromBits(bits):
-    chars = []
-    for b in range(int(len(bits) / 8)):
-        byte = bits[b*8:(b+1)*8]
-        chars.append(chr(int(''.join([str(bit) for bit in byte]), 2)))
-    return ''.join(chars)
-
-def getBytesFromBitArray(bitArray):
-
-    value = 0
-
-    for bit in bitArray:
-        value = (value << 1) | bit
-
-    return RSA.int_to_bytes(value)
-
 def printMatriz3D(A_in):
     for i in range(0,5):
         print("||||")
         for x in range(0,5):
-            print(getBytesFromBitArray(A_in[i][x]).hex())
+            print(bytes_from_bits(A_in[i][x]).hex())
 
 def printArray3D(A_in):
-        print(getBytesFromBitArray(A_in).hex())
+        print(bytes_from_bits(A_in).hex())
