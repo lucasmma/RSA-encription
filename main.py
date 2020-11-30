@@ -1,7 +1,6 @@
 #!usr/bin
 #coding: utf8
 import RSAencryption as RSAenc
-import base64
 import SHA3
 from Utils import bits_from_bytes, string_from_bits, bytes_from_int, bytes_from_bits, bits_from_hexadecimal
 

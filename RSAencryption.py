@@ -1,11 +1,8 @@
 #!usr/bin
 #coding: utf8
 import HandlePrimes as primes
-import base64
-import sympy 
 import SHA3
 import random
-from hashlib import sha512
 from Utils import bits_from_bytes, bytes_from_int, bytes_from_bits, int_from_bytes
 
 g = 512
